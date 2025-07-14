@@ -16,52 +16,52 @@ A Terraform module for provisioning and managing Kubernetes clusters on Thalassa
 
 ## Requirements
 
-| Name | Version |
-|------|---------|
-| terraform | >= 1.0 |
-| thalassa | >= 0.8 |
+| Name      | Version |
+| --------- | ------- |
+| terraform | >= 1.0  |
+| thalassa  | >= 0.8  |
 
 ## Providers
 
-| Name | Version |
-|------|---------|
-| thalassa | >= 0.8 |
+| Name     | Version |
+| -------- | ------- |
+| thalassa | >= 0.8  |
 
 ## Modules
 
-| Name | Source | Version |
-|------|--------|---------|
-| nodepools | ./modules/nodepool | n/a |
+| Name      | Source             | Version |
+| --------- | ------------------ | ------- |
+| nodepools | ./modules/nodepool | n/a     |
 
 ## Resources
 
-| Name | Type |
-|------|------|
-| thalassa_kubernetes_cluster.this | resource |
+| Name                               | Type     |
+| ---------------------------------- | -------- |
+| thalassa_kubernetes_cluster.this   | resource |
 | thalassa_kubernetes_node_pool.this | resource |
 
 ## Inputs
 
 ### Required
 
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| name | The name of the Kubernetes cluster | `string` | n/a | yes |
-| region | The region to create the Kubernetes & Module resources in | `string` | `"nl-01"` | yes |
-| subnet_id | The ID of the subnet to create the Kubernetes cluster in | `string` | n/a | yes |
+| Name      | Description                                               | Type     | Default   | Required |
+| --------- | --------------------------------------------------------- | -------- | --------- | :------: |
+| name      | The name of the Kubernetes cluster                        | `string` | n/a       |   yes    |
+| region    | The region to create the Kubernetes & Module resources in | `string` | `"nl-01"` |   yes    |
+| subnet_id | The ID of the subnet to create the Kubernetes cluster in  | `string` | n/a       |   yes    |
 
 ### Optional
 
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| organisation_id | The ID of the organisation to create the resources in. If not provided, the organisation set in the provider will be used | `string` | `null` | no |
-| description | The description of the Kubernetes cluster | `string` | `null` | no |
-| labels | The labels to apply to the module resources | `map(string)` | `{}` | no |
-| annotations | The annotations to apply to the module resources | `map(string)` | `{}` | no |
-| cni | The CNI to use for the Kubernetes cluster | `string` | `"cilium"` | no |
-| cluster_version | The version of the Kubernetes cluster | `string` | `"1.33"` | no |
-| vpc_id | The ID of the VPC to create the Kubernetes cluster in | `string` | n/a | no |
-| nodepools | The nodepools to create for the Kubernetes cluster | `map(object({...}))` | `{}` | no |
+| Name            | Description                                                                                                               | Type                 | Default    | Required |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------- | -------------------- | ---------- | :------: |
+| organisation_id | The ID of the organisation to create the resources in. If not provided, the organisation set in the provider will be used | `string`             | `null`     |    no    |
+| description     | The description of the Kubernetes cluster                                                                                 | `string`             | `null`     |    no    |
+| labels          | The labels to apply to the module resources                                                                               | `map(string)`        | `{}`       |    no    |
+| annotations     | The annotations to apply to the module resources                                                                          | `map(string)`        | `{}`       |    no    |
+| cni             | The CNI to use for the Kubernetes cluster                                                                                 | `string`             | `"cilium"` |    no    |
+| cluster_version | The version of the Kubernetes cluster                                                                                     | `string`             | `"1.33"`   |    no    |
+| vpc_id          | The ID of the VPC to create the Kubernetes cluster in                                                                     | `string`             | n/a        |    no    |
+| nodepools       | The nodepools to create for the Kubernetes cluster                                                                        | `map(object({...}))` | `{}`       |    no    |
 
 ### Node Pool Configuration
 
@@ -74,23 +74,23 @@ nodepools = {
     availability_zones = list(string)
     replicas           = optional(number, 1)
     subnet_id          = string
-    
+
     # Node pool metadata
     labels      = optional(map(string))
     annotations = optional(map(string))
-    
+
     # Auto scaling
     enable_auto_scaling = optional(bool, false)
     min_replicas        = optional(number)
     max_replicas        = optional(number)
-    
+
     # Auto healing
     enable_autohealing = optional(bool, false)
-    
+
     # Versioning
     kubernetes_version = optional(string)
     upgrade_strategy  = optional(string, "always")
-    
+
     # Node customizations
     node_labels      = optional(map(string))
     node_annotations = optional(map(string))
@@ -105,14 +105,14 @@ nodepools = {
 
 ## Outputs
 
-| Name | Description |
-|------|-------------|
-| `cluster_id` | The ID of the created Kubernetes cluster |
-| `cluster_name` | The name of the created Kubernetes cluster |
-| `cluster_region` | The region where the cluster is deployed |
-| `cluster_version` | The Kubernetes version of the cluster |
-| `cluster_cni` | The CNI used by the cluster |
-| `nodepool_ids` | Map of node pool names to their IDs |
+| Name              | Description                                |
+| ----------------- | ------------------------------------------ |
+| `cluster_id`      | The ID of the created Kubernetes cluster   |
+| `cluster_name`    | The name of the created Kubernetes cluster |
+| `cluster_region`  | The region where the cluster is deployed   |
+| `cluster_version` | The Kubernetes version of the cluster      |
+| `cluster_cni`     | The CNI used by the cluster                |
+| `nodepool_ids`    | Map of node pool names to their IDs        |
 
 ## Usage
 
@@ -126,7 +126,7 @@ module "kubernetes" {
   description     = "Production Kubernetes cluster"
   region          = "nl-01"
   subnet_id       = "subnet-12345"
-  
+
   labels = {
     environment = "production"
     team        = "platform"
@@ -144,12 +144,12 @@ module "kubernetes" {
   description     = "Production Kubernetes cluster with multiple node pools"
   region          = "nl-01"
   subnet_id       = module.vpc.private_subnet_ids["private"]
-  
+
   labels = {
     environment = "production"
     team        = "platform"
   }
-  
+
   nodepools = {
     "system" = {
       machine_type       = "pgp-large"
@@ -161,7 +161,7 @@ module "kubernetes" {
         node-pool = "system"
       }
     }
-    
+
     "workers" = {
       machine_type       = "pgp-medium"
       availability_zones = ["nl-01a", "nl-01b", "nl-01c"]
@@ -208,4 +208,3 @@ This module is licensed under the MIT License. See the LICENSE file for details.
 ## Support
 
 For support and questions, please open an issue in the GitHub repository or contact the Thalassa Cloud team.
-
