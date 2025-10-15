@@ -2,7 +2,7 @@
 terraform {
   required_providers {
     thalassa = {
-      version = ">= 0.8"
+      version = ">= 0.12"
       source  = "thalassa-cloud/thalassa"
     }
   }
@@ -48,6 +48,7 @@ module "vpc" {
   name            = "kubernetes-example"
   description     = "VPC for Kubernetes example"
   region          = var.region
+
   labels = {
     "module" = "vpc"
   }
@@ -89,19 +90,25 @@ module "kubernetes" {
   description     = "Kubernetes example for Thalassa Cloud Kubernetes module"
   region          = var.region
   cni             = "cilium"
-  cluster_version = "v1.32.5-1"
   labels          = local.labels
   annotations     = local.annotations
   vpc_id          = module.vpc.vpc_id
-
   # Deploy the Control Plane in the private subnet of the VPC
   subnet_id = module.vpc.private_subnet_ids["private"]
+
+  auto_upgrade_policy  = "latest-stable"
+  maintenance_day      = 5
+  maintenance_start_at = 20
+  # api_server_acls      = ["10.0.0.0/0"]
 
   nodepools = {
     "workers" = {
       machine_type       = "pgp-medium"
       availability_zones = var.availability_zones
-      replicas           = 1
+      # replicas           = 0
+      enable_autoscaling = true
+      min_replicas       = 1
+      max_replicas       = 2
       subnet_id          = module.vpc.public_subnet_ids["public"]
       labels = {
         "module" = "nodepool"

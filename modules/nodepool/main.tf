@@ -19,7 +19,8 @@ variable "availability_zones" {
 variable "replicas" {
   description = "The number of replicas to use for the nodepool"
   type        = number
-  nullable    = false
+  nullable    = true
+  default     = null
 }
 
 variable "subnet_id" {
@@ -46,10 +47,11 @@ variable "enable_autohealing" {
   nullable    = false
 }
 
-variable "enable_auto_scaling" {
+variable "enable_autoscaling" {
   description = "Whether to enable auto scaling for the nodepool"
   type        = bool
-  nullable    = false
+  nullable    = true
+  default     = false
 }
 
 variable "upgrade_strategy" {
@@ -60,23 +62,23 @@ variable "upgrade_strategy" {
 }
 
 variable "min_replicas" {
-  description = "The minimum number of replicas to use for the nodepool"
+  description = "The minimum number of replicas to use for the nodepool (only used when autoscaling is enabled)"
   type        = number
-  nullable    = false
-  default     = 0
+  nullable    = true
+  default     = null
 }
 
 variable "max_replicas" {
-  description = "The maximum number of replicas to use for the nodepool"
+  description = "The maximum number of replicas to use for the nodepool (only used when autoscaling is enabled)"
   type        = number
-  nullable    = false
-  default     = 0
+  nullable    = true
+  default     = null
 }
 
 variable "kubernetes_version" {
   description = "The Kubernetes version to use for the nodepool"
   type        = string
-  nullable    = false
+  nullable    = true
 }
 
 variable "node_labels" {
@@ -122,9 +124,9 @@ resource "thalassa_kubernetes_node_pool" "this" {
 
   enable_autohealing = var.enable_autohealing
 
-  #   enable_auto_scaling = each.value.enable_auto_scaling
-  #   min_replicas = each.value.min_replicas
-  #   max_replicas = each.value.max_replicas
+  enable_autoscaling = var.enable_autoscaling
+  min_replicas = var.enable_autoscaling ? coalesce(var.min_replicas, 0) : null
+  max_replicas = var.enable_autoscaling ? coalesce(var.max_replicas, 0) : null
 
   node_labels      = var.node_labels
   node_annotations = var.node_annotations
