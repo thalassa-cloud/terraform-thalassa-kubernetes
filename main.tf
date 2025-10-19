@@ -18,3 +18,7 @@ resource "thalassa_kubernetes_cluster" "this" {
     allowed_cidrs = var.api_server_acls
   }
 }
+
+output "cluster" {
+  value = thalassa_kubernetes_cluster.this
+}
