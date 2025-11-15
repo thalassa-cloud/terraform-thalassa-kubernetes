@@ -2,7 +2,7 @@
 terraform {
   required_providers {
     thalassa = {
-      version = ">= 0.12"
+      version = ">= 0.14"
       source  = "thalassa-cloud/thalassa"
     }
   }
