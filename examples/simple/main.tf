@@ -2,7 +2,7 @@
 terraform {
   required_providers {
     thalassa = {
-      version = ">= 0.12"
+      version = ">= 0.14"
       source  = "thalassa-cloud/thalassa"
     }
   }
@@ -116,6 +116,20 @@ module "kubernetes" {
       annotations = {
         "module" = "nodepool"
       }
+      node_labels = {
+        "node-type" = "worker"
+      }
+      node_annotations = {
+        "node-type" = "worker"
+      }
+      node_taints = [
+        {
+          key      = "node-type"
+          value    = "worker"
+          effect   = "NoSchedule"
+          operator = "Equal"
+        }
+      ]
     }
   }
 }
