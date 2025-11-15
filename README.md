@@ -2,18 +2,6 @@
 
 A Terraform module for provisioning and managing Kubernetes clusters on Thalassa Cloud. This module provides a complete solution for creating production-ready Kubernetes clusters with configurable node pools, networking, and advanced features.
 
-## Features
-
-- **Managed Kubernetes Clusters**: Create and manage Kubernetes clusters with ease
-- **Flexible Node Pools**: Configure multiple node pools with different machine types and configurations
-- **Multi-AZ Support**: Deploy nodes across multiple availability zones for high availability
-- **Auto Healing**: Automatic node replacement for improved reliability
-- **Custom Networking**: Support for custom VPC and subnet configurations
-- **CNI Options**: Choose between Cilium and custom CNI implementations
-- **Node Customization**: Apply custom labels, annotations, and taints to nodes
-- **Upgrade Strategies**: Configurable upgrade strategies for node pools
-- **Resource Tagging**: labeling and annotation support
-
 ## Requirements
 
 | Name      | Version |
