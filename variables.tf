@@ -80,6 +80,18 @@ variable "api_server_acls" {
   }
 }
 
+variable "disable_public_endpoint" {
+  description = "Whether to disable the public endpoint for the Kubernetes cluster. When disabled, the cluster will only be accessible via the private endpoint in the VPC."
+  type        = bool
+  default     = false
+}
+
+variable "control_plane_security_group_ids" {
+  description = "The security group IDs to attach to the control plane"
+  type        = list(string)
+  default     = []
+}
+
 variable "maintenance_day" {
   description = "The day of the week to perform maintenance on the Kubernetes cluster. Valid values are: 0-6. Where 0 is Sunday and 6 is Saturday."
   type        = number

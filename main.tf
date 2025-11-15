@@ -14,6 +14,9 @@ resource "thalassa_kubernetes_cluster" "this" {
   maintenance_day      = var.maintenance_day
   maintenance_start_at = var.maintenance_start_at
 
+  disable_public_endpoint    = var.disable_public_endpoint
+  security_group_attachments = var.control_plane_security_group_ids
+
   api_server_acls {
     allowed_cidrs = var.api_server_acls
   }
