@@ -59,7 +59,7 @@ module "nodepools" {
   node_labels        = each.value.node_labels
   node_annotations   = each.value.node_annotations
   node_taints        = each.value.node_taints
-  security_group_ids = each.value.security_group_ids
+  security_group_ids = (var.create_security_groups) ? concat(each.value.security_group_ids, [thalassa_security_group.cluster[0].id]) : each.value.security_group_ids
 }
 
 output "nodepools" {
