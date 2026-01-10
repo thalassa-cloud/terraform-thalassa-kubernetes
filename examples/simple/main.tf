@@ -2,7 +2,7 @@
 terraform {
   required_providers {
     thalassa = {
-      version = ">= 0.17"
+      version = ">= 0.18"
       source  = "thalassa-cloud/thalassa"
     }
   }
@@ -101,6 +101,30 @@ module "kubernetes" {
   maintenance_start_at = 20
   # api_server_acls      = ["10.0.0.0/0"]
 
+  # Create security groups with default ingress and egress rules for node pools and control plane
+  # Can be controlled with variables;
+
+  # Controlling the allowed node port ingress ranges
+  # cluster_nodeport_ingress_cidr_block = "0.0.0.0/0"
+  # cluster_nodeport_ingress_cidr_block_udp = "0.0.0.0/0"
+  # This is also in-place for allowing load balancers to forward traffic to the nodes, otherwise, make sure that 
+  # load balancers have another method to allow traffic to the nodes (such as using the same security group as the nodes)
+
+  # cluster_to_controlplane_egress_rules controls various egress rules from the cluster to the control plane
+  # shouldn't need to be changed in most cases
+  # 
+  # cluster_egress_rules controls various egress rules from the cluster to the internet
+  # i.g. for http/https traffic, icmp, etc. Expand this list to allow or restrict traffic from the cluster to the internet
+  # 
+  # vpc_internal_dns_egress_rules is used to inject VPC internal DNS firewall rules into the cluster security group
+  # This is needed so that the cluster can resolve DNS names
+
+  # Use the create_security_groups variable to control whether to create the security groups
+  # Note; please be aware that removing the security groups when already provisioned, 
+  # may cause existing nodes to lose connectivity to the cluster while they are being recreated due to limitations of the Security Group association functionality.
+  # If false, you can create the security groups and attach them to the cluster and node pools through the security_group_ids variables
+  create_security_groups = true
+
   nodepools = {
     "workers" = {
       machine_type       = "pgp-medium"
@@ -122,14 +146,15 @@ module "kubernetes" {
       node_annotations = {
         "node-type" = "worker"
       }
-      node_taints = [
-        {
-          key      = "node-type"
-          value    = "worker"
-          effect   = "NoSchedule"
-          operator = "Equal"
-        }
-      ]
+      # Add Node Pool Taints if desired
+      # node_taints = [
+      #   {
+      #     key      = "node-type"
+      #     value    = "worker"
+      #     effect   = "NoSchedule"
+      #     operator = "Equal"
+      #   }
+      # ]
     }
   }
 }

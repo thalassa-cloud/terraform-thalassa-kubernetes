@@ -61,7 +61,7 @@ resource "thalassa_kubernetes_cluster" "this" {
   maintenance_start_at = var.maintenance_start_at
 
   disable_public_endpoint        = var.disable_public_endpoint
-  security_group_attachments     = var.control_plane_security_group_ids
+  security_group_attachments     = (var.create_security_groups) ? concat(var.control_plane_security_group_ids, [thalassa_security_group.controlplane[0].id]) : var.control_plane_security_group_ids
   pod_security_standards_profile = var.pod_security_standards_profile
 
   delete_protection = var.control_plane_delete_protection
