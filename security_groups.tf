@@ -311,3 +311,7 @@ resource "thalassa_security_group_ingress_rule" "cluster" {
 output "controlplane_security_group_id" {
   value = (var.create_security_groups) ? thalassa_security_group.controlplane[0].id : null
 }
+
+output "cluster_security_group_id" {
+  value = (var.create_security_groups) ? thalassa_security_group.cluster[0].id : null
+}
