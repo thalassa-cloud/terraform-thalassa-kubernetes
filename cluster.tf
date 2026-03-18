@@ -39,6 +39,26 @@ variable "pod_security_standards_profile" {
   }
 }
 
+variable "networking_kube_proxy_deployment" {
+  description = "Deployment mode of the kube proxy. Must be one of: custom, managed, disabled. Default: managed."
+  type        = string
+  default     = "managed"
+  validation {
+    condition     = contains(["custom", "managed", "disabled"], var.networking_kube_proxy_deployment)
+    error_message = "Invalid kube-proxy deployment mode. Valid values are: custom, managed, disabled, or null."
+  }
+}
+
+variable "networking_kube_proxy_mode" {
+  description = "Mode of the kube proxy. Must be one of: iptables, ipvs. Default: iptables."
+  type        = string
+  default     = "iptables"
+  validation {
+    condition     = contains(["iptables", "ipvs"], var.networking_kube_proxy_mode)
+    error_message = "Invalid kube-proxy mode. Valid values are: iptables, ipvs."
+  }
+}
+
 # Kubernetes cluster
 resource "thalassa_kubernetes_cluster" "this" {
   organisation_id = var.organisation_id
@@ -55,6 +75,9 @@ resource "thalassa_kubernetes_cluster" "this" {
 
   cluster_version = var.cluster_version
   subnet_id       = var.subnet_id
+
+  networking_kube_proxy_deployment = var.networking_kube_proxy_deployment
+  networking_kube_proxy_mode       = var.networking_kube_proxy_mode
 
   auto_upgrade_policy  = var.auto_upgrade_policy
   maintenance_day      = var.maintenance_day
