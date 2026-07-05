@@ -97,9 +97,9 @@ variable "node_taints" {
   description = "The node taints to use for the nodepool"
   type = list(object({
     key      = string
-    value    = string
+    value    = optional(string)
     effect   = string
-    operator = string
+    operator = optional(string)
   }))
   nullable = true
   default  = []
@@ -145,9 +145,9 @@ resource "thalassa_kubernetes_node_pool" "this" {
     for_each = var.node_taints != null ? var.node_taints : []
     content {
       key      = node_taints.value.key
-      value    = node_taints.value.value
       effect   = node_taints.value.effect
-      operator = node_taints.value.operator
+      operator = coalesce(node_taints.value.operator, node_taints.value.value != null ? "Equal" : "Exists")
+      value    = node_taints.value.value
     }
   }
 }

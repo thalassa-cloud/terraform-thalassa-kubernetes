@@ -31,9 +31,9 @@ variable "nodepools" {
     node_annotations = optional(map(string))
     node_taints = optional(list(object({
       key      = string
-      value    = string
+      value    = optional(string)
       effect   = string
-      operator = optional(string, "Exists")
+      operator = optional(string)
     })))
   }))
   default = {}
