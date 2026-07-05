@@ -158,3 +158,11 @@ module "kubernetes" {
     }
   }
 }
+
+output "cluster_security_group_id" {
+  value = module.kubernetes.cluster_security_group_id
+}
+
+output "controlplane_security_group_id" {
+  value = module.kubernetes.controlplane_security_group_id
+}
