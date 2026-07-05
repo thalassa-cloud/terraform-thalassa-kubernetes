@@ -1,4 +1,5 @@
-name: build
+name: CI
+
 on:
   push:
     branches:
@@ -6,10 +7,88 @@ on:
   pull_request:
     branches:
       - main
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
-  review:
+  fmt:
+    name: terraform fmt
     runs-on: ubuntu-latest
     steps:
-      - uses: reviewdog/action-setup@e04ffabe3898a0af8d0fb1af00c188831c4b5893 # v1.3.2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
         with:
-          reviewdog_version: latest
+          terraform_version: 1.15.2
+
+      - name: Check formatting
+        run: terraform fmt -check -recursive -diff
+
+  validate:
+    name: terraform validate (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: root
+            workdir: .
+          - name: nodepool
+            workdir: modules/nodepool
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - uses: reviewdog/action-terraform-validate@6365bf83a0ea1fb7966229f8a59849fd82cc2de2 # v1.17.4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          workdir: ${{ matrix.workdir }}
+          name: terraform validate (${{ matrix.name }})
+          terraform_version: 1.15.2
+          reporter: github-pr-review
+          filter_mode: nofilter
+          fail_level: error
+
+  tflint:
+    name: tflint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
+        with:
+          terraform_version: 1.15.2
+
+      - name: Terraform init
+        run: |
+          terraform init -backend=false
+          terraform -chdir=modules/nodepool init -backend=false
+
+      - uses: reviewdog/action-tflint@54a5e5aed57dcfbb4662ec548de876df33d6288d # v1.25.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          filter_mode: nofilter
+          fail_level: error
+          tflint_init: "true"
+
+  trivy:
+    name: trivy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - uses: reviewdog/action-trivy@0cab87b781d62e7b01ca66d2900484dedba06306 # v1.13.10
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          trivy_command: config
+          trivy_target: .
+          reporter: github-pr-review
+          filter_mode: nofilter
+          fail_level: error
+          trivy_flags: --severity MEDIUM,HIGH,CRITICAL

@@ -166,6 +166,15 @@ variable "cluster_ingress_rules" {
   ]
 }
 
+locals {
+  cluster_ingress_rules = [
+    for rule in var.cluster_ingress_rules : merge(
+      rule,
+      rule.name == "allow-node-port-range" ? { remote_address = var.cluster_nodeport_ingress_cidr_block } : {},
+      rule.name == "allow-node-port-range-udp" ? { remote_address = var.cluster_nodeport_ingress_cidr_block_udp } : {},
+    )
+  ]
+}
 
 resource "thalassa_security_group" "controlplane" {
   count = (var.create_security_groups) ? 1 : 0
@@ -292,7 +301,7 @@ resource "thalassa_security_group_ingress_rule" "cluster" {
 
   # Dynamic ingress rules from variable
   dynamic "rule" {
-    for_each = var.cluster_ingress_rules
+    for_each = local.cluster_ingress_rules
     content {
       name                           = rule.value.name
       ip_version                     = rule.value.ip_version
