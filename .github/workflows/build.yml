@@ -69,7 +69,7 @@ jobs:
           terraform init -backend=false
           terraform -chdir=modules/nodepool init -backend=false
 
-      - uses: reviewdog/action-tflint@ac21f7671251b29bbeb280ede595cb9c5b8710c7 # v1.26.0
+      - uses: reviewdog/action-tflint@c332ae72f14fd853c08323a60383b396cc34715a # v1.28.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
